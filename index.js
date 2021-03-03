@@ -1,11 +1,12 @@
 const express = require("express");
 const MongoClient = require("mongodb").MongoClient;
-require("dotenv").config();
 const cors = require("cors");
 const bodyParser = require("body-parser");
 const app = express();
+const port = 4000;
 app.use(cors());
 app.use(bodyParser.json());
+require("dotenv").config();
 
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@cluster0.q43xx.mongodb.net/${process.env.DB_NAME}?retryWrites=true&w=majority`;
 const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
@@ -15,6 +16,15 @@ app.get("/", (req, res) => {
 });
 
 client.connect((err) => {
+	const availableAppointmentCollection = client.db("healthyTeeth").collection("available");
+
+	//GET
+	app.get("/availableAppointments", (req, res) => {
+		availableAppointmentCollection.find({}).toArray((err, documents) => {
+			res.send(documents);
+		});
+	});
+
 	const appointmentCollection = client.db("healthyTeeth").collection("appointments");
 
 	//POST
@@ -33,4 +43,4 @@ client.connect((err) => {
 	});
 });
 
-app.listen(4000);
+app.listen(port);
