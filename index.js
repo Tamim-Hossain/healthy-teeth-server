@@ -18,6 +18,14 @@ app.get("/", (req, res) => {
 client.connect((err) => {
 	const availableAppointmentCollection = client.db("healthyTeeth").collection("available");
 
+	//POST
+	app.post("/addAvailable", (req, res) => {
+		const available = req.body;
+		availableAppointmentCollection.insertOne(available).then((result) => {
+			res.send(result.insertedCount > 0);
+		});
+	});
+
 	//GET
 	app.get("/availableAppointments", (req, res) => {
 		availableAppointmentCollection.find({}).toArray((err, documents) => {
